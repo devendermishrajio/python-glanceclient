@@ -73,8 +73,13 @@ class HTTPClient(object):
             compression = kwargs.get('ssl_compression', True)
 
             if not compression:
-                self.session.mount("glance+https://", https.HTTPSAdapter())
-                self.endpoint = 'glance+' + self.endpoint
+                #self.session.mount("glance+https://", https.HTTPSAdapter())
+                #self.endpoint = 'glance+' + self.endpoint
+ 
+                #TODO: Merge patch 618637a5bd545d8271d9349b08a8e4ab2841d086
+                # This is a hack to make glance client work. We need to remove
+                # SSL compression code out of glance client as per the patch.
+                self.session.mount("https://", https.HTTPSAdapter())
 
                 self.session.verify = (
                     kwargs.get('cacert', requests.certs.where()),

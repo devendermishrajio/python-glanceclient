@@ -6,8 +6,8 @@ export PBR_VERSION=$(shell dpkg-parsechangelog --show-field Version)
 %:
 	dh $@  --with python2
 
-override_dh_auto_test:
-	testr init && testr run
+#override_dh_auto_test:
+#	testr init && testr run
 
 get-orig-source:
 	uscan --verbose --force-download --rename --destdir=../build-area

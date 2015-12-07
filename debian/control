@@ -39,9 +39,7 @@ Depends:
  python-requests,
  python-setuptools,
  python-warlock (>= 1.0.1),
- python-six (>= 1.7.0),
- ${misc:Depends},
- ${python:Depends}
+ python-six (>= 1.7.0)
 Breaks: glance-client
 Replaces: glance-client
 Description: Client library for Openstack glance server.

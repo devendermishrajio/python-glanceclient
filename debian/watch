@@ -1,3 +1,0 @@
-version=3
-opts="uversionmangle=s/%7E/~/" \
- http://tarballs.openstack.org/python-glanceclient/ python-glanceclient-(\d.*).tar.gz

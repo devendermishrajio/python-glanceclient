@@ -21,6 +21,7 @@ from six.moves.urllib import parse
 import warlock
 
 from glanceclient.common import utils
+from glanceclient.common import http
 from glanceclient import exc
 from glanceclient.v2 import schemas
 
@@ -193,6 +194,28 @@ class Controller(object):
         if do_checksum and checksum is not None:
             body = utils.integrity_iter(body, checksum)
 
+        return utils.IterableWithLength(body, content_length)
+
+    def data_direct_download(self, image_id, do_checksum=True, chunk_size=1024):
+        """Retrieve data of an image without overloading glance server (using direct download link of the image)
+
+        :param image_id:    ID of the image to download.
+        :param do_checksum: Enable/disable checksum validation.
+        Similar to data but get the link to image and download on its own.
+        """
+        url = 'v2/images/%s/link' % image_id
+        resp, body  = self.http_client.get(url)
+        direct_link = body.get('image_path', None)
+        checksum    = body.get('image_checksum', None)
+
+        if not direct_link:
+            raise Exception("Image '%s' does not have a valid direct download path" % image_id)
+
+        resp, body      = http.direct_download_from_link(direct_link, chunk_size)
+        content_length  = int(resp.headers.get('content-length', 0))
+
+        if do_checksum and checksum is not None:
+            body = utils.integrity_iter(body, checksum)
         return utils.IterableWithLength(body, content_length)
 
     def upload(self, image_id, image_data, image_size=None):

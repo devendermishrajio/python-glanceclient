@@ -289,7 +289,7 @@ def _close_after_stream(response, chunk_size):
     # and ideally reduce the number of HTTPConnectionPool full warnings.
     response.close()
 
-def direct_download_from_link(direct_link, chunk_size=1024):
+def direct_download_from_link(direct_link, chunk_size=CHUNKSIZE):
     session = requests.Session()
     session.headers["User-Agent"] = USER_AGENT
     try:
@@ -316,25 +316,11 @@ def direct_download_from_link(direct_link, chunk_size=1024):
     HTTPClient.log_http_response(resp)
     return resp, body_iter
 
-def _direct_download_handle_response(resp, chunk_size=1024):
+def _direct_download_handle_response(resp, chunk_size=CHUNKSIZE):
         if not resp.ok:
             LOG.debug("Request returned failure status %s." % resp.status_code)
             raise exc.from_response(resp, resp.content)
-
-        content_type = resp.headers.get('Content-Type')
-
         # Read body into string if it isn't obviously image data
-        if content_type == 'application/octet-stream':
-            # Do not read all response in memory when downloading an image.
-            body_iter = _close_after_stream(resp, CHUNKSIZE)
-        else:
-            content = resp.text
-            if content_type and content_type.startswith('application/json'):
-                # Let's use requests json method, it should take care of
-                # response encoding
-                body_iter = resp.json()
-            else:
-                body_iter = resp.iter_content(chunk_size)
-
+        body_iter = _close_after_stream(resp, chunk_size)
         return resp, body_iter
 

@@ -196,7 +196,12 @@ class Controller(object):
 
         return utils.IterableWithLength(body, content_length)
 
-    def data_direct_download(self, image_id, do_checksum=True, chunk_size=1024):
+    def get_link(self, image_id):
+        url = '/v2/images/%s/link' % image_id
+        resp, body = self.http_client.get(url)
+        return self.model(**body)
+
+    def data_direct_download(self, image_id, do_checksum=True, chunk_size=64*1024):
         """Retrieve data of an image without overloading glance server (using direct download link of the image)
 
         :param image_id:    ID of the image to download.
